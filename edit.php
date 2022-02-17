@@ -1,36 +1,36 @@
 <?php
-    $dsn = "mysql:dbname=test;host=127.0.0.1;port=3006";
-    $user = "root";
-    $password = "root";
+
+require_once 'user.php';
+require_once 'validationException.php';
+
+$class = new User();
+$id = isset($_GET['id']) ? $_GET['id'] : null;
+$errorMessage = [];
+$user = null;
+
+if(is_null($id)){
+    $errorMessage[] = 'URLが不正です';
+} else {
+    $user = $class->show($id);
+}
+
+if (!is_null($id) && empty($user)) {
+    $errorMessage[] = '登録者が存在しません';
+}
+
+if (!empty($_POST)) {
+    $name = $_POST['name'];
+    $tel = $_POST['tel'];
+    $address = $_POST['address'];
 
     try {
-        $db = new PDO($dsn, $user, $password);
-    } catch(PDOException $e) {
-        echo "接続に失敗しました:".$e->getMessage."\n";
-        exit();
-    }
-
-    $id = isset($_GET['id']) ? $_GET['id'] : null;
-    $stmt = $db->prepare("SELECT * FROM users WHERE id = :id");
-    $stmt->bindValue(':id', $id);
-    $stmt->execute();
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if(!empty($_POST)){
-        $name = $_POST['name'];
-        $tel = $_POST['tel'];
-        $address = $_POST['address'];
-
-        $sql = "UPDATE users SET name = :name, address = :address, tel = :tel WHERE id = :id AND del_flg = false";
-        $stmt = $db->prepare($sql);
-        $stmt->bindValue(':name', $name, PDO::PARAM_STR);
-        $stmt->bindValue(':tel', $tel, PDO::PARAM_STR);
-        $stmt->bindValue(':address', $address, PDO::PARAM_STR);
-        $stmt->bindValue(':id', $id, PDO::PARAM_STR);
-        $stmt->execute();
+        $class->update($id, $name, $tel, $address);
         header('Location: http://localhost:8080');
+
+    } catch (ValidationException $e) {
+        $errorMessage = $e->getArrayMessage();
     }
-    
+}
 ?>
 <html lang="ja">
 
