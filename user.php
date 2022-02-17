@@ -87,4 +87,5 @@ class User extends Base
         }
         return $stmt->execute();
     }
+    
 }

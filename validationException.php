@@ -9,4 +9,5 @@ class validationException extends Exception {
     {
         return json_decode($this->getMessage(), $assoc);
     }
+    
 }

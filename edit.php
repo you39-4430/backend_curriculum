@@ -1,5 +1,4 @@
 <?php
-
 require_once 'user.php';
 require_once 'validationException.php';
 
